@@ -1,0 +1,6 @@
+export var ScrollDirectionEnum;
+(function (ScrollDirectionEnum) {
+    ScrollDirectionEnum["vertical"] = "vertical";
+    ScrollDirectionEnum["horizontal"] = "horizontal";
+})(ScrollDirectionEnum || (ScrollDirectionEnum = {}));
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2Nyb2xsLWRpcmVjdGlvbi5lbnVtLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vbGlicmFyeS9uZ3gtc2Nyb2xsc3B5L3NyYy9saWIvc2Nyb2xsLWRpcmVjdGlvbi5lbnVtLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE1BQU0sQ0FBTixJQUFZLG1CQUdYO0FBSEQsV0FBWSxtQkFBbUI7SUFDM0IsNENBQXFCLENBQUE7SUFDckIsZ0RBQXlCLENBQUE7QUFDN0IsQ0FBQyxFQUhXLG1CQUFtQixLQUFuQixtQkFBbUIsUUFHOUIiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgZW51bSBTY3JvbGxEaXJlY3Rpb25FbnVtIHtcbiAgICB2ZXJ0aWNhbCA9ICd2ZXJ0aWNhbCcsXG4gICAgaG9yaXpvbnRhbCA9ICdob3Jpem9udGFsJ1xufVxuIl19
