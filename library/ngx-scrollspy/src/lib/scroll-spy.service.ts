@@ -105,6 +105,9 @@ export class ScrollSpyService {
       throw new Error(`ScrollSpyService: The scroll element with the id [${scrollElementId}] exists.`);
     }
   }
+  public checkScrollElementExists(scrollElementId: string): boolean {
+    return this._scrollElements[scrollElementId] != null;
+  }
 
   public setItem(itemId: string, elementRef: ElementRef, scrollElementId = defaultElementId): void {
     this._checkItemNotExists(itemId);

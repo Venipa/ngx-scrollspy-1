@@ -13,6 +13,7 @@ export class ScrollElementDirective implements OnInit, AfterViewInit, OnDestroy 
   private _destroy$ = new Subject<void>();
   @Input('uniScrollElement') elementId: string;
   @Input() direction: ScrollDirectionEnum = ScrollDirectionEnum.vertical;
+  @Input() destroyElementsSubscription: boolean = true;
 
   @ContentChildren(ScrollSpyDirective, { descendants: true })
   private _scrollSpyElements: QueryList<ScrollSpyDirective>;
@@ -25,7 +26,7 @@ export class ScrollElementDirective implements OnInit, AfterViewInit, OnDestroy 
   constructor(private _el: ElementRef, private _scrollSpyService: ScrollSpyService) {}
 
   ngOnInit(): void {
-    this._scrollSpyService.setScrollElement(this.elementId, this._el, this.direction);
+    if (this.destroyElementsSubscription || !this._scrollSpyService.checkScrollElementExists(this.elementId)) this._scrollSpyService.setScrollElement(this.elementId, this._el, this.direction);
     if (this._scrollSpyService.attributeType === 'id') {
       this._el.nativeElement.setAttribute('id', this.elementId);
     } else {
@@ -35,14 +36,14 @@ export class ScrollElementDirective implements OnInit, AfterViewInit, OnDestroy 
 
   ngAfterViewInit(): void {
     this._scrollSpyElements.changes.pipe(debounceTime(10), takeUntil(this._destroy$)).subscribe((elements: ScrollSpyDirective[]) => {
-      elements.forEach((element) => {
-        this._scrollSpyService.changeScrollElement(element.itemId, element.scrollElement, this.elementId);
+      if (elements.length > 0) elements.forEach((element) => {
+        this._scrollSpyService.changeScrollElement(element.itemId, element.scrollElement, this.elementId, true);
       });
     });
   }
 
   ngOnDestroy(): void {
-    this._scrollSpyService.deleteScrollElement(this.elementId);
+    if(this.destroyElementsSubscription) this._scrollSpyService.deleteScrollElement(this.elementId);
     this._destroy$.next();
   }
 }
