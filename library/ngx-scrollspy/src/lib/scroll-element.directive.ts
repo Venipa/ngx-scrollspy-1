@@ -3,41 +3,46 @@ import { Directive, HostListener, ElementRef, Input, OnInit, OnDestroy, ContentC
 import { ScrollDirectionEnum } from './scroll-direction.enum';
 import { ScrollSpyService } from './scroll-spy.service';
 import { ScrollSpyDirective } from './scroll-spy.directive';
+import { Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 
 @Directive({
-    selector: '[uniScrollElement]'
+  selector: '[uniScrollElement]'
 })
 export class ScrollElementDirective implements OnInit, AfterViewInit, OnDestroy {
-    @Input('uniScrollElement') elementId: string;
-    @Input() direction: ScrollDirectionEnum = ScrollDirectionEnum.vertical;
+  private _destroy$ = new Subject<void>();
+  @Input('uniScrollElement') elementId: string;
+  @Input() direction: ScrollDirectionEnum = ScrollDirectionEnum.vertical;
 
-    @ContentChildren(ScrollSpyDirective, { descendants: true })
-    private _scrollSpyElements: QueryList<ScrollSpyDirective>;
+  @ContentChildren(ScrollSpyDirective, { descendants: true })
+  private _scrollSpyElements: QueryList<ScrollSpyDirective>;
 
-    @HostListener('scroll', ['$event'])
-    onScroll($event) {
-        this._scrollSpyService.updateScrollElement(this.elementId);
+  @HostListener('scroll', ['$event'])
+  onScroll($event) {
+    this._scrollSpyService.updateScrollElement(this.elementId);
+  }
+
+  constructor(private _el: ElementRef, private _scrollSpyService: ScrollSpyService) {}
+
+  ngOnInit(): void {
+    this._scrollSpyService.setScrollElement(this.elementId, this._el, this.direction);
+    if (this._scrollSpyService.attributeType === 'id') {
+      this._el.nativeElement.setAttribute('id', this.elementId);
+    } else {
+      this._el.nativeElement.setAttribute('data-id', this.elementId);
     }
+  }
 
-    constructor(private _el: ElementRef, private _scrollSpyService: ScrollSpyService) {}
+  ngAfterViewInit(): void {
+    this._scrollSpyElements.changes.pipe(debounceTime(10), takeUntil(this._destroy$)).subscribe((elements: ScrollSpyDirective[]) => {
+      elements.forEach((element) => {
+        this._scrollSpyService.changeScrollElement(element.itemId, element.scrollElement, this.elementId);
+      });
+    });
+  }
 
-    ngOnInit(): void {
-        this._scrollSpyService.setScrollElement(this.elementId, this._el, this.direction);
-        if (this._scrollSpyService.attributeType === 'id') {
-            this._el.nativeElement.setAttribute('id', this.elementId);
-        } else {
-            this._el.nativeElement.setAttribute('data-id', this.elementId);
-        }
-    }
-
-    ngAfterViewInit(): void {
-        const _scrollSpyElements: ScrollSpyDirective[] = this._scrollSpyElements.toArray();
-        _scrollSpyElements.forEach((element) => {
-            this._scrollSpyService.changeScrollElement(element.itemId, element.scrollElement, this.elementId);
-        });
-    }
-
-    ngOnDestroy(): void {
-        this._scrollSpyService.deleteScrollElement(this.elementId);
-    }
+  ngOnDestroy(): void {
+    this._scrollSpyService.deleteScrollElement(this.elementId);
+    this._destroy$.next();
+  }
 }
